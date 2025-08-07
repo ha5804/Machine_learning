@@ -1,4 +1,6 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
 
 class MyData:
     def __init__(self):
@@ -26,15 +28,24 @@ class MyData:
         y = label.map(label_int)
         return y 
     
+    def binary_label(self):
+        y = self.label_to_int()
+        y_binary = (y != 11).astype(int)
+        return y_binary
+    
 data = MyData()
 data.get_data()
 x = data.encode()
-y = data.label_to_int()
-print(x)
-print(y.value_counts())
+y = data.binary_label()
+# print(x)
+# print(y.value_counts())
+# print(y)
 print(y)
 
+class util:
+    def __init__(self):
+        pass
 
-
-
+    def predinct(self, x, y):
+        
 
