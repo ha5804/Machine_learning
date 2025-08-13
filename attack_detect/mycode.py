@@ -1,61 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
 import numpy as np 
-class MyData:
-    def __init__(self):
-        self.train = None
-        self.test = None
-
-    def get_data(self):
-        self.train = pd.read_csv("./attack_detect/data/KDDTrain+.csv", header = None)
-        self.test = pd.read_csv("./attack_detect/data/KDDTest+.csv", header = None)
-    
-    def encode(self, feature_number=[1,2,3], is_train=True):
-        if is_train:
-            selected = self.train[feature_number]
-        else:
-            selected = self.test[feature_number]
-
-        encoded = pd.get_dummies(selected, feature_number)
-        encoded = encoded.astype(int)
-
-        # train/test 컬럼 맞추기
-        if not is_train:
-            for col in self.train_encoded_columns:
-                if col not in encoded.columns:
-                    encoded[col] = 0
-            encoded = encoded[self.train_encoded_columns]  # 동일 순서
-        else:
-            self.train_encoded_columns = encoded.columns.tolist()
-
-        return encoded
-
-    
-    def get_label(self):
-        label = self.train.iloc[:, -2]
-        return label 
-
-    def label_to_int(self):
-        label = self.get_label()
-        unique_labels = sorted(label.unique())
-        label_int = {label: idx for idx, label in enumerate(unique_labels)}
-        y = label.map(label_int)
-        return y 
-    
-    def binary_label(self):
-        y = self.label_to_int()
-        y_binary = (y != 11).astype(int)
-        return y_binary
-    
-data = MyData()
-data.get_data()
-x = data.encode()
-y = data.binary_label()
-print(x)
-# print(y.value_counts())
-# print(y)
-print(y)
 
 class Model:
     def __init__(self):
@@ -108,22 +53,14 @@ class MyOptim:
         pass 
         # ===========================
 
+class MyPlot:
+    def __init__(self):
+        self.figsize = (8,8)
+
+    def plot_loss(self, loss):
+        plt.figure(self.figsize)
+        plt.xlabel("iteration")
+        plt.ylabel("loss")
+        plt.plot(loss, color = 'r')
 
 
-def train(x, y):
-    model = Model()
-    optim = MyOptim(model)
-    loss_lis = []
-    y = y.values.reshape(-1,1)
-    for _ in range(100):
-        predict = model.predict(x)
-        loss = optim.compute_loss(y, predict)
-        grad = optim.compute_gradient(x, y, predict)
-        optim.step(grad)
-        if _ % 10 == 0:
-            loss_lis.append(loss)
-    return model, loss_lis
-
-model, ls = train(x, y)
-for i in ls:
-    print(i)
