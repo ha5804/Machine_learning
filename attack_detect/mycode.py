@@ -11,11 +11,26 @@ class MyData:
         self.train = pd.read_csv("./attack_detect/data/KDDTrain+.csv", header = None)
         self.test = pd.read_csv("./attack_detect/data/KDDTest+.csv", header = None)
     
-    def encode(self, feature_number = [1,2,3]):
-        selected = self.train[feature_number]
+    def encode(self, feature_number=[1,2,3], is_train=True):
+        if is_train:
+            selected = self.train[feature_number]
+        else:
+            selected = self.test[feature_number]
+
         encoded = pd.get_dummies(selected, feature_number)
-        encoded = encoded.astype(int) #저장해야 정수로변환
-        return encoded #x
+        encoded = encoded.astype(int)
+
+        # train/test 컬럼 맞추기
+        if not is_train:
+            for col in self.train_encoded_columns:
+                if col not in encoded.columns:
+                    encoded[col] = 0
+            encoded = encoded[self.train_encoded_columns]  # 동일 순서
+        else:
+            self.train_encoded_columns = encoded.columns.tolist()
+
+        return encoded
+
     
     def get_label(self):
         label = self.train.iloc[:, -2]
@@ -107,8 +122,8 @@ def train(x, y):
         optim.step(grad)
         if _ % 10 == 0:
             loss_lis.append(loss)
-    return loss_lis
+    return model, loss_lis
 
-ls = train(x, y)
+model, ls = train(x, y)
 for i in ls:
     print(i)
