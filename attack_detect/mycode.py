@@ -58,7 +58,7 @@ class MyPlot:
         self.figsize = (8,8)
 
     def plot_loss(self, loss):
-        plt.figure(self.figsize)
+        plt.figure(figsize = self.figsize)
         plt.xlabel("iteration")
         plt.ylabel("loss")
         plt.plot(loss, color = 'r')
